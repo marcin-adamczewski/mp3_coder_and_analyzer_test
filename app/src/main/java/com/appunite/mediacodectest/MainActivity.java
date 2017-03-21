@@ -2,6 +2,7 @@ package com.appunite.mediacodectest;
 
 import android.Manifest;
 import android.content.res.AssetFileDescriptor;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,12 +12,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+import com.semantive.waveformandroid.waveform.Segment;
+import com.semantive.waveformandroid.waveform.WaveformFragment;
+import com.semantive.waveformandroid.waveform.soundfile.CheapSoundFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "lol";
     private MediaPlayer mediaPlayer;
     private AmpChart ampChart;
+    private AmpChartLib ampChartLib;
+    private CheapSoundFile cheapSoundFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,12 +39,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         ampChart = (AmpChart) findViewById(R.id.amp_chart);
+        ampChartLib = (AmpChartLib) findViewById(R.id.amp_chart_lib);
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
 
         mediaPlayer = new MediaPlayer();
 
-        findViewById(R.id.dupa_btn).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.decode_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
                 decodeAndPlay();
@@ -50,11 +59,47 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.amp_lib_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                drawAmpChartUsingLib();
+            }
+        });
+
+    }
+
+    private void drawAmpChartUsingLib() {
+        try {
+            cheapSoundFile = CheapSoundFile.create(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/zintest.mp3").getAbsolutePath(), null);
+            ampChartLib.bindData(cheapSoundFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, new CustomWaveformFragment())
+                .commit();
+    }
+
+    public static class CustomWaveformFragment extends WaveformFragment {
+
+        @Override
+        protected String getFileName() {
+            return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/zintest.mp3";
+        }
+
+        @Override
+        protected List<Segment> getSegments() {
+            return Arrays.asList(
+                    new Segment(55.2, 55.8, Color.rgb(238, 23, 104)),
+                    new Segment(56.2, 56.6, Color.rgb(238, 23, 104)),
+                    new Segment(58.4, 59.9, Color.rgb(184, 92, 184)));
+        }
     }
 
     private void drawAmpChart() {
         try {
-            final File outputFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC) + "/dupa.wav");
+            final File outputFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC) + "/yyy.wav");
             if (outputFile.exists()) {
                 outputFile.delete();
             }
