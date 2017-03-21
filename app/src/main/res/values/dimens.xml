@@ -1,0 +1,10 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- Amp Chart-->
+    <dimen name="amp_chart_line_width">0.1dp</dimen>
+    <dimen name="amp_chart_padding">1dp</dimen>
+    <dimen name="amp_samples_spacing">0.1dp</dimen>
+</resources>
